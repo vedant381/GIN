@@ -1,7 +1,6 @@
 import psycopg2
 from psycopg2.extras import execute_values
 from prettytable import PrettyTable
-import matplotlib.pyplot as plt
 import json
 import random
 import time
@@ -124,7 +123,7 @@ def run_queries():
 # ---------------------------
 # Display results
 # ---------------------------
-def print_and_plot(metrics):
+def print_metrics(metrics):
     table = PrettyTable()
     table.field_names = ["Query", "B-tree (ms)", "B-tree size(MB)", "GIN (ms)", "GIN size(MB)", "Speedup (x)"]
     
@@ -138,26 +137,6 @@ def print_and_plot(metrics):
         table.add_row([q, f"{btree_time:.2f}", f"{btree_size:.2f}", f"{gin_time:.2f}", f"{gin_size:.2f}", f"{speedup:.2f}"])
     
     print(table)
-    
-    # Plot chart
-    import matplotlib.pyplot as plt
-    x = range(len(queries))
-    btree_times = [metrics[q]["btree"]["time"] for q in queries]
-    gin_times = [metrics[q]["gin"]["time"] for q in queries]
-    
-    width = 0.35
-    fig, ax = plt.subplots(figsize=(10,6))
-    ax.bar(x, btree_times, width, label="B-tree", color="salmon")
-    ax.bar([i+width for i in x], gin_times, width, label="GIN", color="skyblue")
-    ax.set_ylabel("Execution Time (ms)")
-    ax.set_xticks([i+width/2 for i in x])
-    ax.set_xticklabels(list(queries), rotation=15)
-    ax.set_title("B-tree vs GIN Performance")
-    ax.legend()
-    plt.tight_layout()
-    plt.savefig("index_comparison.png")
-    plt.show()
-    print("Chart saved as 'index_comparison.png'")
 
 # ---------------------------
 # Main script
@@ -199,7 +178,7 @@ if __name__ == "__main__":
         }
 
     # 5. Display and plot
-    print_and_plot(metrics)
+    print_metrics(metrics)
     
     # Optional: save metrics to JSON
     with open("metrics.json", "w") as f:
